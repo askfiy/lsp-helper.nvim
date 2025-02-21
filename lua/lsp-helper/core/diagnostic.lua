@@ -57,7 +57,7 @@ end
 ---@return integer? win_id
 function M.open(opts)
     opts = vim.tbl_deep_extend("force", {
-        float = { border = config.get_float_border("rounded") },
+        border = config.get_float_border("rounded"),
     }, opts or {})
 
     if not ok then
