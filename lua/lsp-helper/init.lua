@@ -20,7 +20,6 @@ local function handle_events(server_conf)
 
         server_conf[event] = function(client, bufnr)
             if config.lspconfig[event] then
-                vim.print(config.lspconfig[event](client, bufnr))
                 config.lspconfig[event](client, bufnr)
             end
 
