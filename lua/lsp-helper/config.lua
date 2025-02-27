@@ -46,7 +46,7 @@ local config = {
             - close the formatter provided by Lsp-Server
             - close semanticTokens by Lsp-Server
         ]]
-        on_init = function(client, bufnr)
+        on_init = function(client, initialize_result)
             -- client.server_capabilities.documentFormattingProvider = false
             -- client.server_capabilities.semanticTokensProvider = nil
         end,
