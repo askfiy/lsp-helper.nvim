@@ -92,12 +92,16 @@ function M.setup(opts)
     assert(ok, "Not Found lspconfig")
 
     config.update(opts)
-    lspconfig_util.on_setup = function(server_config, _)
-        handle_events(server_config)
 
-        server_config.handlers = get_handlers(server_config)
-        server_config.capabilities = get_capabilities(server_config)
-    end
+    lspconfig_util.on_setup = lspconfig_util.add_hook_before(
+        lspconfig_util.on_setup,
+        function(server_config, _)
+            handle_events(server_config)
+
+            server_config.handlers = get_handlers(server_config)
+            server_config.capabilities = get_capabilities(server_config)
+        end
+    )
 
     vim.diagnostic.config(config.diagnostic.config)
 
