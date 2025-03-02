@@ -18,13 +18,13 @@ local function handle_events(server_conf)
     for _, event in ipairs(events) do
         local private_event = server_conf[event]
 
-        server_conf[event] = function(client, bufnr)
+        server_conf[event] = function(client, args)
             if config.lspconfig[event] then
-                config.lspconfig[event](client, bufnr)
+                config.lspconfig[event](client, args)
             end
 
             if type(private_event) == "function" then
-                private_event(client, bufnr)
+                private_event(client, args)
             end
         end
     end
