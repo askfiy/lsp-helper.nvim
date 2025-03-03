@@ -56,9 +56,13 @@ function M.scroll_hover_to_up(scroll_lines)
             vim.opt.scrolloff = cache_scrolloff
 
             -- Updat Tempourogress bar
-            float.flooter_handler(winner, bufnr)
+            return float.flooter_handler(winner, bufnr)
         end
     end
+
+    local key = vim.api.nvim_replace_termcodes("<c-b>", true, false, true)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    vim.api.nvim_feedkeys(key, "n", true)
 end
 
 ---@param scroll_lines integer
@@ -107,9 +111,13 @@ function M.scroll_hover_to_down(scroll_lines)
             vim.opt.scrolloff = cache_scrolloff
 
             -- Updat Tempourogress bar
-            float.flooter_handler(winner, bufnr)
+            return float.flooter_handler(winner, bufnr)
         end
     end
+
+    local key = vim.api.nvim_replace_termcodes("<c-f>", true, false, true)
+    ---@diagnostic disable-next-line: param-type-mismatch
+    vim.api.nvim_feedkeys(key, "n", true)
 end
 
 return M
