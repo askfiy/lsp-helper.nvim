@@ -3,121 +3,45 @@ local float = require("lsp-helper.core.float")
 
 local M = {}
 
--- Number of scrolling rows
-local cache_scrolloff = vim.opt.scrolloff:get()
+--- The first time to open, the second time to exit
+--- @param user_config? vim.lsp.buf.signature_help.Opts
+function M.signature_help(user_config)
+    local winner, bufnr = float.get_lsp_float({
+        signatureHelp = true,
+    })
 
-function M.signature_help()
-    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-        if pcall(vim.api.nvim_buf_get_var, bufnr, config.float.flag) then
-            vim.api.nvim_win_close(vim.fn.bufwinid(bufnr), false)
-            return
-        end
+    if bufnr or winner then
+        vim.api.nvim_win_close(winner, false)
+        return
     end
 
-    vim.lsp.buf.signature_help()
+    user_config = vim.tbl_deep_extend("keep", user_config or {}, {
+        border = config.float.border,
+    })
+
+    vim.lsp.buf.signature_help(user_config)
 end
 
----@param scroll_lines integer
-function M.scroll_hover_to_up(scroll_lines)
-    scroll_lines = scroll_lines or 5
+-- The first time to open, the second time to enter, the third time to exit
+--- @param user_config? vim.lsp.buf.hover.Opts
+function M.hover(user_config)
+    local winner, bufnr = float.get_lsp_float({
+        hover = true,
+    })
 
-    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-        if pcall(vim.api.nvim_buf_get_var, bufnr, config.float.flag) then
-            local winner = vim.fn.bufwinid(bufnr)
-            local cursor_line = vim.fn.line(".", winner)
-            local buffer_total_line = vim.api.nvim_buf_line_count(bufnr)
-            local window_height = vim.api.nvim_win_get_height(winner)
-            local win_first_line = vim.fn.line("w0", winner)
-
-            if buffer_total_line + 1 <= window_height or cursor_line == 1 then
-                return
-            end
-
-            vim.opt.scrolloff = 0
-
-            if cursor_line > win_first_line then
-                if win_first_line - scroll_lines > 1 then
-                    vim.api.nvim_win_set_cursor(
-                        winner,
-                        { win_first_line - scroll_lines, 0 }
-                    )
-                else
-                    vim.api.nvim_win_set_cursor(winner, { 1, 0 })
-                end
-            elseif cursor_line - scroll_lines < 1 then
-                vim.api.nvim_win_set_cursor(winner, { 1, 0 })
-            else
-                vim.api.nvim_win_set_cursor(
-                    winner,
-                    { cursor_line - scroll_lines, 0 }
-                )
-            end
-
-            vim.opt.scrolloff = cache_scrolloff
-
-            -- Updat Tempourogress bar
-            return float.flooter_handler(winner, bufnr)
-        end
+    if (bufnr or winner) and vim.api.nvim_get_current_win() == winner then
+        vim.api.nvim_win_close(winner, false)
+        return
     end
 
-    local key = vim.api.nvim_replace_termcodes("<c-b>", true, false, true)
-    ---@diagnostic disable-next-line: param-type-mismatch
-    vim.api.nvim_feedkeys(key, "n", true)
-end
+    user_config = vim.tbl_deep_extend("keep", user_config or {}, {
+        border = config.float.border,
+    })
 
----@param scroll_lines integer
-function M.scroll_hover_to_down(scroll_lines)
-    scroll_lines = scroll_lines or 5
-
-    for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-        if pcall(vim.api.nvim_buf_get_var, bufnr, config.float.flag) then
-            local winner = vim.fn.bufwinid(bufnr)
-            local cursor_line = vim.fn.line(".", winner)
-            local buffer_total_line = vim.api.nvim_buf_line_count(bufnr)
-            local window_height = vim.api.nvim_win_get_height(winner)
-            local window_last_line = vim.fn.line("w$", winner)
-
-            if
-
-                buffer_total_line + 1 <= window_height
-                or cursor_line == buffer_total_line
-            then
-                return
-            end
-
-            vim.opt.scrolloff = 0
-
-            if cursor_line < window_last_line then
-                if window_last_line + scroll_lines < buffer_total_line then
-                    vim.api.nvim_win_set_cursor(
-                        winner,
-                        { window_last_line + scroll_lines, 0 }
-                    )
-                else
-                    vim.api.nvim_win_set_cursor(
-                        winner,
-                        { buffer_total_line, 0 }
-                    )
-                end
-            elseif cursor_line + scroll_lines >= buffer_total_line then
-                vim.api.nvim_win_set_cursor(winner, { buffer_total_line, 0 })
-            else
-                vim.api.nvim_win_set_cursor(
-                    winner,
-                    { cursor_line + scroll_lines, 0 }
-                )
-            end
-
-            vim.opt.scrolloff = cache_scrolloff
-
-            -- Updat Tempourogress bar
-            return float.flooter_handler(winner, bufnr)
-        end
-    end
-
-    local key = vim.api.nvim_replace_termcodes("<c-f>", true, false, true)
-    ---@diagnostic disable-next-line: param-type-mismatch
-    vim.api.nvim_feedkeys(key, "n", true)
+    user_config = vim.tbl_deep_extend("keep", user_config or {}, {
+        border = config.float.border,
+    })
+    vim.lsp.buf.hover(user_config)
 end
 
 return M

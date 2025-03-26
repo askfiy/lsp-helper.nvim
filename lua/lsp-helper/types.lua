@@ -1,5 +1,4 @@
 ---@class ConfigFloat
----@field flag string
 ---@field border string
 ---@field progress_format fun(progress: number): string
 

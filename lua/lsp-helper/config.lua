@@ -6,7 +6,6 @@ local M = {}
 
 local config = {
     float = {
-        flag = "lsp-float", -- No need to modify it, just a window flag
         border = "none", -- The style of the floating window
         progress_format = function(progress)
             return ("%s%%"):format(tostring(progress))

@@ -28,31 +28,33 @@ local function include_diagnostic_namespace_by_name(ignore_lsp_sources)
     return namespaces
 end
 
----@param opts? vim.diagnostic.GotoOpts
+---@param opts? vim.diagnostic.JumpOpts
 function M.goto_prev(opts)
     opts = vim.tbl_deep_extend("force", {
+        count = -1,
         float = { border = config.get_float_border("rounded") },
         namespace = exclude_diagnostic_namespace_by_name(
             config.diagnostic.jump_ignore_lsp_sources
         ),
     }, opts or {})
 
-    vim.diagnostic.goto_prev(opts)
+    vim.diagnostic.jump(opts)
 end
 
----@param opts? vim.diagnostic.GotoOpts
+---@param opts? vim.diagnostic.JumpOpts
 function M.goto_next(opts)
     opts = vim.tbl_deep_extend("force", {
+        count = 1,
         float = { border = config.get_float_border("rounded") },
         namespace = exclude_diagnostic_namespace_by_name(
             config.diagnostic.jump_ignore_lsp_sources
         ),
     }, opts or {})
 
-    vim.diagnostic.goto_next(opts)
+    vim.diagnostic.jump(opts)
 end
 
----@param opts? vim.diagnostic.GotoOpts
+---@param opts? vim.diagnostic.JumpOpts
 ---@return integer? float_bufnr
 ---@return integer? win_id
 function M.open(opts)

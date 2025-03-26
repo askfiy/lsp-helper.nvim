@@ -33,12 +33,13 @@ require("lspconfig")["pyright"].setup()
 The provided functions are as follows:
 
 ```lua
+require("lsp-helper").lsp.signature_help -- Provides toggleable signature_help; press once to open, press twice to close
+require("lsp-helper").lsp.hover -- Provides toggleable hover; Press toggleable hover once, press to focus twice, and press to close three times
+require("lsp-helper").float.scroll_hover_to_up -- Provides scrolling for signature_help and hover
+require("lsp-helper").float.scroll_hover_to_down -- Provides scrolling for signature_help and hover
 require("lsp-helper").diagnostic.goto_prev  -- Can skip specific lsp sources
 require("lsp-helper").diagnostic.goto_next  -- Can skip specific lsp sources
 require("lsp-helper").diagnostic.open -- Works with telescope; opens a floating window if there is a diagnostic under the cursor, otherwise opens workspace diagnostics
-require("lsp-helper").signature_help -- Provides toggleable signature_help; press once to open, press twice to close
-require("lsp-helper").scroll_hover_to_up -- Provides scrolling for signature_help and hover
-require("lsp-helper").scroll_hover_to_down -- Provides scrolling for signature_help and hover
 ```
 
 ## Default Configs
@@ -46,7 +47,6 @@ require("lsp-helper").scroll_hover_to_down -- Provides scrolling for signature_h
 ```lua
 {
     float = {
-        border = "none", -- The style of the floating window
         progress_format = function(progress)
             return ("%s%%"):format(tostring(progress))
         end,

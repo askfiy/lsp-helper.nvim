@@ -1,24 +1,23 @@
 -- author: askfiy
 
 local config = require("lsp-helper.config")
-local float = require("lsp-helper.core.float")
 
 -- TODO: debug mode
 -- require("lsp-helper.debug")
 
 local M = {
     lsp = require("lsp-helper.core.lsp"),
+    float = require("lsp-helper.core.float"),
     diagnostic = require("lsp-helper.core.diagnostic"),
 }
 
----@param server_conf lspconfig.Config
-local function handle_events(server_conf)
+---@param user_config lspconfig.Config
+local function handle_events(user_config)
     local events = { "on_init", "on_attach", "on_error", "on_exit" }
-
     for _, event in ipairs(events) do
-        local private_event = server_conf[event]
+        local private_event = user_config.handlers[event]
 
-        server_conf[event] = function(client, args)
+        user_config[event] = function(client, args)
             if config.lspconfig[event] then
                 config.lspconfig[event](client, args)
             end
@@ -34,23 +33,6 @@ end
 ---@return table<string,function>
 local function get_handlers(server_conf)
     local handlers = server_conf.handlers or vim.lsp.handlers
-    local methods = vim.lsp.protocol.Methods
-
-    local lsp_float_config = {
-        -- :h nvim_open_win() config
-        border = config.float.border,
-    }
-
-    handlers[methods.textDocument_hover] = vim.lsp.with(
-        float.lsp_float_handler(vim.lsp.handlers.hover),
-        lsp_float_config
-    )
-
-    handlers[methods.textDocument_signatureHelp] = vim.lsp.with(
-        float.lsp_float_handler(vim.lsp.handlers.signature_help),
-        lsp_float_config
-    )
-
     return handlers
 end
 
@@ -95,11 +77,10 @@ function M.setup(opts)
 
     lspconfig_util.on_setup = lspconfig_util.add_hook_before(
         lspconfig_util.on_setup,
-        function(server_config, _)
-            handle_events(server_config)
-
-            server_config.handlers = get_handlers(server_config)
-            server_config.capabilities = get_capabilities(server_config)
+        function(user_config, _)
+            handle_events(user_config)
+            user_config.handlers = get_handlers(user_config)
+            user_config.capabilities = get_capabilities(user_config)
         end
     )
 
