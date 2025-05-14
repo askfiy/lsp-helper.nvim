@@ -11,11 +11,11 @@ local M = {
     diagnostic = require("lsp-helper.core.diagnostic"),
 }
 
----@param user_config lspconfig.Config
+---@param user_config vim.lsp.Config
 local function handle_events(user_config)
     local events = { "on_init", "on_attach", "on_error", "on_exit" }
     for _, event in ipairs(events) do
-        local private_event = user_config.handlers[event]
+        local private_event = user_config[event]
 
         user_config[event] = function(client, args)
             if config.lspconfig[event] then
@@ -29,14 +29,14 @@ local function handle_events(user_config)
     end
 end
 
----@param server_conf lspconfig.Config
+---@param server_conf vim.lsp.Config
 ---@return table<string,function>
 local function get_handlers(server_conf)
     local handlers = server_conf.handlers or vim.lsp.handlers
     return handlers
 end
 
----@param server_conf lspconfig.Config
+---@param server_conf vim.lsp.Config
 ---@return lsp.ClientCapabilities
 local function get_capabilities(server_conf)
     local capabilities = server_conf.capabilities
@@ -68,22 +68,28 @@ local function get_capabilities(server_conf)
     return capabilities
 end
 
+local function on_mount()
+    local lsp_config = getmetatable(vim.lsp.config)
+    local mount = vim.tbl_deep_extend("keep", lsp_config, {})
+
+    mount.__newindex = function(self, name, cfg)
+        cfg.handlers = get_handlers(cfg)
+        cfg.capabilities = get_capabilities(cfg)
+        handle_events(cfg)
+
+        if lsp_config.__newindex then
+            lsp_config.__newindex(self, name, cfg)
+        end
+    end
+
+    setmetatable(vim.lsp.config, mount)
+end
+
 ---@param opts table<string, any>
 function M.setup(opts)
-    local ok, lspconfig_util = pcall(require, "lspconfig.util")
-    assert(ok, "Not Found lspconfig")
-
     config.update(opts)
 
-    lspconfig_util.on_setup = lspconfig_util.add_hook_before(
-        lspconfig_util.on_setup,
-        function(user_config, _)
-            handle_events(user_config)
-            user_config.handlers = get_handlers(user_config)
-            user_config.capabilities = get_capabilities(user_config)
-        end
-    )
-
+    on_mount()
     vim.diagnostic.config(config.diagnostic.config)
 
     for icon_type, icon_font in pairs(config.diagnostic.icons) do

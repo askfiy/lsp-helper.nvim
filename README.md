@@ -1,6 +1,6 @@
 # README
 
-lsp-helper is a decorative plugin designed to simplify the setup of lspconfig and provides some utility functions:
+lsp-helper is a decorative plugin designed to simplify the setup of `vim.lsp.config` and provides some utility functions:
 
 - Provides toggleable signature_help
 - Offers scrolling methods for signature_help and hover
@@ -22,10 +22,14 @@ Using lazy:
 
 ## Usage
 
-Once lsp-helper is configured, it will automatically take effect. Simply execute lspconfig\[server_name\].setup(), example from pyright:
+Once lsp-helper is configured, it will automatically take effect. Simply execute `vim.lsp.config`, example from pyright:
 
 ```lua
-require("lspconfig")["pyright"].setup()
+vim.lsp.config("pyright", {
+  root_markers = { '.git' },
+  ...
+})
+vim.lsp.enable("pyright")
 ```
 
 ## Available Functions
